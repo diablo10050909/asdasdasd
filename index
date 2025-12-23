@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login System Demo</title>
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: #0f1117;
+      color: #fff;
+    }
+    .container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      width: 360px;
+      background: #1c1f2b;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+    h2 { text-align: center; margin-bottom: 20px; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4f6ef7;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #3b57d1; }
+    .link {
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      color: #aaa;
+    }
+    .error { color: #ff5c5c; font-size: 14px; }
+    .dashboard {
+      display: none;
+      padding: 30px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="auth">
+  <div class="card">
+    <h2 id="title">로그인</h2>
+    <input type="text" id="username" placeholder="아이디">
+    <input type="password" id="password" placeholder="비밀번호">
+    <div class="error" id="error"></div>
+    <button onclick="login()">로그인</button>
+    <div class="link" onclick="toggle()">회원가입으로 이동</div>
+  </div>
+</div>
+
+<div class="dashboard" id="dashboard">
+  <header>
+    <h2>대시보드</h2>
+    <button onclick="logout()" style="width:100px;">로그아웃</button>
+  </header>
+  <p id="welcome"></p>
+  <ul>
+    <li>📁 프로필</li>
+    <li>⚙️ 설정</li>
+    <li>🚀 기능 페이지</li>
+  </ul>
+</div>
+
+<script>
+  let isLoginMode = true;
+
+  function toggle() {
+    isLoginMode = !isLoginMode;
+    document.getElementById("title").innerText = isLoginMode ? "로그인" : "회원가입";
+    document.querySelector("button").innerText = isLoginMode ? "로그인" : "회원가입";
+    document.querySelector(".link").innerText = isLoginMode ? "회원가입으로 이동" : "로그인으로 이동";
+    document.getElementById("error").innerText = "";
+  }
+
+  function login() {
+    const id = username.value;
+    const pw = password.value;
+    const error = document.getElementById("error");
+
+    if (!id || !pw) {
+      error.innerText = "모든 항목을 입력하세요.";
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+
+    if (isLoginMode) {
+      if (!users[id] || users[id] !== pw) {
+        error.innerText = "아이디 또는 비밀번호가 틀렸습니다.";
+        return;
+      }
+      localStorage.setItem("login", "true");
+      localStorage.setItem("userId", id);
+      showDashboard();
+    } else {
+      if (users[id]) {
+        error.innerText = "이미 존재하는 아이디입니다.";
+        return;
+      }
+      users[id] = pw;
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("회원가입 완료!");
+      toggle();
+    }
+  }
+
+  function showDashboard() {
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("welcome").innerText =
+      "환영합니다, " + localStorage.getItem("userId") + "님!";
+  }
+
+  function logout() {
+    localStorage.removeItem("login");
+    localStorage.removeItem("userId");
+    location.reload();
+  }
+
+  if (localStorage.getItem("login") === "true") {
+    showDashboard();
+  }
+</script>
+
+</body>
+</html>
