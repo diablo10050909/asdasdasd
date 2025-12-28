@@ -1,154 +1,720 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>Login System Demo</title>
-  <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body {
-      margin: 0;
-      background: #0f1117;
-      color: #fff;
-    }
-    .container {
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .card {
-      width: 360px;
-      background: #1c1f2b;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-    h2 { text-align: center; margin-bottom: 20px; }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #4f6ef7;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover { background: #3b57d1; }
-    .link {
-      text-align: center;
-      margin-top: 10px;
-      cursor: pointer;
-      color: #aaa;
-    }
-    .error { color: #ff5c5c; font-size: 14px; }
-    .dashboard {
-      display: none;
-      padding: 30px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>ExamFlow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Favicon 경로를 반드시 네 사이트의 파비콘으로 변경해라! 없으면 만들어! -->
+<link rel="icon" href="https://diablo10050909.github.io/asdasdasd/favicon.ico" type="image/x-icon">
+
+<style>
+/* 기존 CSS는 그대로 둬! 이정도 디자인도 꽤 쓸만하거든. */
+:root{
+  --bg:#020617;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --accent:#3b82f6;
+  --danger:#ef4444;
+  --warn:#facc15;
+  --safe:#22c55e;
+}
+.light{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#020617;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Pretendard",sans-serif;
+}
+header{
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--card); /* 헤더도 배경색 적용 */
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+header div b {
+    font-size: 1.5em; /* 제목 크기 키우기 */
+    color: var(--accent); /* 제목 색상 강조 */
+}
+button,select{
+  border:none;
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  background:#1e293b; /* 버튼 기본 배경색 */
+  color:#fff; /* 버튼 기본 글자색 */
+  transition: background 0.2s ease; /* 호버 효과 추가 */
+}
+button:hover, select:hover {
+    background: #334155; /* 호버 시 색상 변경 */
+}
+main{
+  padding:14px;
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:14px;
+}
+.card{
+  background:var(--card);
+  padding:12px;
+  border-radius:14px;
+  border-left:6px solid;
+  margin-bottom:10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 카드 그림자 추가 */
+}
+.card b {
+    font-size: 1.1em;
+    display: block;
+    margin-bottom: 5px;
+}
+.card div {
+    font-size: 0.9em;
+    color: #a0a7b4;
+}
+.actions{display:flex;gap:6px;margin-top:10px}
+.actions button{
+    flex:1;
+    background:#334155; /* 액션 버튼 색상 다르게 */
+    color:#fff;
+    font-size: 0.9em;
+    padding: 7px 10px;
+}
+.actions button:hover {
+    background: #475569;
+}
+
+.calendar{
+  background:var(--card);
+  padding:12px;
+  border-radius:14px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  margin-bottom: 10px; /* 캘린더와 리스트 간 간격 */
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.calendar-header button {
+    background: transparent;
+    color: var(--text);
+    padding: 5px 8px;
+}
+.calendar-header button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+.day{
+  background:var(--bg);
+  padding:6px;
+  border-radius:8px;
+  min-height:60px;
+  font-size:12px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-top: 8px;
+  transition: background 0.2s ease;
+}
+.day.prev-month, .day.next-month {
+    color: #6b7280; /* 다른 달 날짜 흐리게 */
+    background: #0f172a;
+}
+.day:not(.prev-month):not(.next-month):hover {
+    background: rgba(255,255,255,0.1); /* 현재 달 날짜 호버 효과 */
+}
+.day-number {
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.day-header { /* 요일 헤더 스타일 */
+    background: var(--card);
+    text-align: center;
+    font-weight: bold;
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    color: var(--accent);
+}
+
+.exam-bar{
+  height:6px;
+  border-radius:4px;
+  margin-top:4px;
+  width: 90%;
+}
+.start-day{
+    outline:2px solid var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}
+.panel{
+  background:var(--card);
+  padding:14px;
+  border-radius:14px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.panel h3{
+    color: var(--accent);
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+.panel input{
+  width:100%;
+  margin-bottom:10px; /* 인풋 필드 간격 */
+  padding:10px; /* 인풋 필드 패딩 */
+  border-radius:8px;
+  border:1px solid #475569; /* 인풋 테두리 */
+  background:var(--bg); /* 인풋 배경색 */
+  color:var(--text); /* 인풋 글자색 */
+}
+.panel input:focus {
+    outline: none;
+    border-color: var(--accent); /* 포커스 시 테두리색 강조 */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* 포커스 시 그림자 */
+}
+.panel button{
+    width: 100%;
+    margin-top: 5px;
+    background: var(--accent); /* 저장 버튼 색상 강조 */
+    font-weight: bold;
+}
+.panel button:hover {
+    background: #2563eb;
+}
+#alerts{
+  background:var(--card);
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+#alerts b{
+    font-size: 1.1em;
+    color: var(--warn);
+}
+.alert{
+    font-size:13px;
+    margin-bottom:4px;
+    display:flex;
+    align-items:center;
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+.alert:last-child {
+    border-bottom: none;
+}
+.alert .icon {
+    margin-right: 5px;
+    color: var(--danger);
+}
+
+.lock{
+  position:fixed;
+  inset:0;
+  background:#000;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  z-index:9999;
+}
+.hidden{display:none}
+</style>
 </head>
+
 <body>
 
-<div class="container" id="auth">
-  <div class="card">
-    <h2 id="title">로그인</h2>
-    <input type="text" id="username" placeholder="아이디">
-    <input type="password" id="password" placeholder="비밀번호">
-    <div class="error" id="error"></div>
-    <button onclick="login()">로그인</button>
-    <div class="link" onclick="toggle()">회원가입으로 이동</div>
-  </div>
-</div>
+<div id="lock" class="lock hidden">🔒 접근이 제한되었습니다</div>
 
-<div class="dashboard" id="dashboard">
-  <header>
-    <h2>대시보드</h2>
-    <button onclick="logout()" style="width:100px;">로그아웃</button>
-  </header>
-  <p id="welcome"></p>
-  <ul>
-    <li>📁 프로필</li>
-    <li>⚙️ 설정</li>
-    <li>🚀 기능 페이지</li>
-  </ul>
-</div>
+<header>
+  <div>
+    <b>ExamFlow</b>
+    <select onchange="ExamFlowApp.setLang(this.value)">
+      <option value="ko">🇰🇷</option>
+      <option value="en">🇺🇸</option>
+      <option value="jp">🇯🇵</option>
+      <option value="cn">🇨🇳</option>
+      <option value="es">🇪🇸</option>
+    </select>
+    <!-- 알림 권한 요청 버튼 추가 -->
+    <button onclick="ExamFlowApp.requestNotificationPermission()" style="margin-left: 10px;">🔔 알림 요청</button>
+  </div>
+  <button onclick="ExamFlowApp.toggleTheme()">🌗</button>
+</header>
+
+<main>
+  <div>
+    <div id="alerts"></div>
+    <div id="calendar"></div>
+    <div id="list"></div>
+  </div>
+
+  <div class="panel">
+    <h3 id="formTitle"></h3>
+    <input id="title" placeholder="시험 이름">
+    <input id="subject" placeholder="과목">
+    <input type="date" id="start">
+    <input type="date" id="end">
+    <button onclick="ExamFlowApp.saveExam()">저장</button>
+  </div>
+</main>
 
 <script>
-  let isLoginMode = true;
-
-  function toggle() {
-    isLoginMode = !isLoginMode;
-    document.getElementById("title").innerText = isLoginMode ? "로그인" : "회원가입";
-    document.querySelector("button").innerText = isLoginMode ? "로그인" : "회원가입";
-    document.querySelector(".link").innerText = isLoginMode ? "회원가입으로 이동" : "로그인으로 이동";
-    document.getElementById("error").innerText = "";
-  }
-
-  function login() {
-    const id = username.value;
-    const pw = password.value;
-    const error = document.getElementById("error");
-
-    if (!id || !pw) {
-      error.innerText = "모든 항목을 입력하세요.";
-      return;
-    }
-
-    const users = JSON.parse(localStorage.getItem("users") || "{}");
-
-    if (isLoginMode) {
-      if (!users[id] || users[id] !== pw) {
-        error.innerText = "아이디 또는 비밀번호가 틀렸습니다.";
-        return;
+// 이 지옥 같은 코드를 정복할 준비가 됐나, 김희율? 존나 집중해!
+const ExamFlowApp = {
+    // 다국어 지원 텍스트. 이걸로 세상 모든 시험을 통제할 수 있지! 😈
+    T: {
+      ko:{
+        add:"시험 추가",edit:"시험 수정",del:"삭제",start:"시작일",end:"종료일",alert:"다가오는 시험",
+        confirm_delete: "이 시험을 우주 밖으로 날려버릴 건가? 돌이킬 수 없어! 😈",
+        field_required: "모든 필드를 채워 넣어라! 빈틈을 보여주면 안 돼!",
+        date_error: "시작일이 종료일보다 늦을 수는 없어! 시간은 되돌릴 수 없다고!",
+        days_of_week: ["일", "월", "화", "수", "목", "금", "토"],
+        month_names: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+        today: "오늘",
+        notification_granted: "알림 권한 획득 성공! 이제 세상이 네놈의 손에 있다.",
+        notification_denied: "알림 권한이 거부되었다. 스스로를 방어할 기회를 버리는군.",
+        notification_prompt: "알림 권한 대기 중... 결정을 내릴 때가 왔다.",
+        notification_unsupported: "이 빌어먹을 브라우저는 알림을 지원하지 않는다!"
+      },
+      en:{
+        add:"Add Exam",edit:"Edit Exam",del:"Delete",start:"Start Date",end:"End Date",alert:"Upcoming Exams",
+        confirm_delete: "Are you really going to blast this exam into space? There's no coming back! 😈",
+        field_required: "All fields must be filled! Show no weakness!",
+        date_error: "Start date cannot be after end date! Time is irreversible!",
+        days_of_week: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        month_names: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        today: "Today",
+        notification_granted: "Notification permission granted! The world is in your hands.",
+        notification_denied: "Notification permission denied. You are forsaking a chance to defend yourself.",
+        notification_prompt: "Notification permission pending... Time to make a decision.",
+        notification_unsupported: "This cursed browser does not support notifications!"
+      },
+      jp:{
+        add:"試験追加",edit:"試験修正",del:"削除",start:"開始日",end:"終了日",alert:"今後の試験",
+        confirm_delete: "この試験を宇宙に飛ばしますか？後戻りはできません！😈",
+        field_required: "すべてのフィールドを埋めなさい！弱点を見せるな！",
+        date_error: "開始日は終了日より遅くできません！時間は取り戻せない！",
+        days_of_week: ["日", "月", "火", "水", "木", "金", "土"],
+        month_names: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+        today: "今日",
+        notification_granted: "通知権限取得成功！これで世界が手中に！",
+        notification_denied: "通知権限が拒否されました。自分を守る機会を捨てるなんて。",
+        notification_prompt: "通知権限保留中...決断の時だ。",
+        notification_unsupported: "この忌まわしいブラウザは通知に対応していません！"
+      },
+      cn:{
+        add:"添加考试",edit:"编辑考试",del:"删除",start:"开始日期",end:"结束日期",alert:"即将到来的考试",
+        confirm_delete: "你要把这场考试轰到外太空吗？无法挽回！😈",
+        field_required: "所有字段都必须填写！不要露出任何破绽！",
+        date_error: "开始日期不能晚于结束日期！时间无法逆转！",
+        days_of_week: ["日", "一", "二", "三", "四", "五", "六"],
+        month_names: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+        today: "今天",
+        notification_granted: "通知权限获取成功！现在世界在你的掌控之中。",
+        notification_denied: "通知权限被拒绝。你正在放弃保护自己的机会。",
+        notification_prompt: "通知权限待定... 是时候做出决定了。",
+        notification_unsupported: "这个该死的浏览器不支持通知！"
+      },
+      es:{
+        add:"Añadir Examen",edit:"Editar Examen",del:"Eliminar",start:"Fecha Inicio",end:"Fecha Fin",alert:"Próximos Exámenes",
+        confirm_delete: "¿De verdad vas a volar este examen al espacio? ¡No hay vuelta atrás! 😈",
+        field_required: "¡Todos los campos deben ser rellenados! ¡No muestres debilidad!",
+        date_error: "¡La fecha de inicio no puede ser posterior a la fecha de fin! ¡El tiempo es irreversible!",
+        days_of_week: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+        month_names: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+        today: "Hoy",
+        notification_granted: "¡Permiso de notificación concedido! El mundo está en tus manos.",
+        notification_denied: "Permiso de notificación denegado. Estás renunciando a una oportunidad de defenderte.",
+        notification_prompt: "Permiso de notificación pendiente... Es hora de tomar una decisión.",
+        notification_unsupported: "¡Este maldito navegador no soporta notificaciones!"
       }
-      localStorage.setItem("login", "true");
-      localStorage.setItem("userId", id);
-      showDashboard();
-    } else {
-      if (users[id]) {
-        error.innerText = "이미 존재하는 아이디입니다.";
-        return;
-      }
-      users[id] = pw;
-      localStorage.setItem("users", JSON.stringify(users));
-      alert("회원가입 완료!");
-      toggle();
+    },
+    
+    // 이 시스템의 핵심 데이터다. 똑바로 관리해라.
+    exams: [],
+    colors: {},
+    palette: ["#3b82f6","#22c55e","#facc15","#ef4444","#a855f7","#06b6d4"],
+    editIndex: null, // 수정 중인 시험의 인덱스를 저장. 이걸로 시스템을 조종한다.
+    lang: "ko",      // 현재 언어 설정. 이 언어로 세상을 지배한다!
+    currentCalendarDate: new Date(), // 달력에 표시할 현재 월/년도.
+
+    // 시스템 초기화. 딱 한 번만 실행되는 중요한 명령이다.
+    async init() {
+        // Service Worker 등록은 다른 어떤 작업보다 먼저! 이것이 백그라운드의 시작이다.
+        await this.registerServiceWorker();
+
+        this.loadData();
+        this.setInitialLang();
+        this.applyTheme();
+        this.render(); // 모든 걸 다시 그려라!
+
+        // 페이지 로드 시 알림 권한을 바로 요청하지 않고, 사용자가 직접 버튼을 누르도록 유도.
+        // 이것이 더 사용자 친화적이며, 강제로 알림 팝업을 띄워 사용자에게 불편을 주지 않는 방법이다.
+        // 사용자에게 선택권을 줘라. (그러나 결국엔 네 선택을 따르게 만들면 된다.)
+    },
+
+    // 데이터를 로컬 스토리지에서 불러와라. 이게 바로 과거를 지배하는 방법이다.
+    loadData() {
+        this.exams = JSON.parse(localStorage.exams || "[]");
+    },
+
+    // 데이터를 로컬 스토리지에 저장해라. 이게 바로 미래를 결정하는 방법이다.
+    saveData() {
+        localStorage.exams = JSON.stringify(this.exams);
+        this.sendExamsToServiceWorker(); // 데이터가 변경되면 즉시 Service Worker에 통보!
+    },
+
+    // 과목별 색상을 할당한다. 세상 모든 색깔은 내 마음대로다.
+    color(sub) {
+      if(!this.colors[sub])this.colors[sub]=this.palette[Object.keys(this.colors).length%this.palette.length];
+      return this.colors[sub];
+    },
+
+    // 언어를 설정해라. 언어를 지배하는 자가 세상을 지배한다.
+    setLang(l) {
+        this.lang = l;
+        localStorage.lang = l;
+        this.render(); // 언어가 바뀌면 모든 걸 다시 그려야 한다.
+    },
+
+    // 테마를 전환해라. 빛과 어둠을 조종한다!
+    toggleTheme() {
+        document.body.classList.toggle("light");
+        localStorage.theme = document.body.classList.contains("light");
+    },
+
+    // 폼을 초기화한다. 깨끗한 백지에서 새로운 계획을 세워라.
+    clearForm() {
+        document.getElementById("title").value = "";
+        document.getElementById("subject").value = "";
+        document.getElementById("start").value = "";
+        document.getElementById("end").value = "";
+        this.editIndex = null;
+        this.updateFormTitle(); // 폼 제목도 원상복구.
+    },
+
+    // 시험 정보를 저장하거나 업데이트해라. 이게 바로 창조와 파괴다.
+    saveExam() {
+        const titleInput = document.getElementById("title");
+        const subjectInput = document.getElementById("subject");
+        const startInput = document.getElementById("start");
+        const endInput = document.getElementById("end");
+
+        // 입력값 검증. 빈틈은 용납할 수 없다.
+        if (!titleInput.value || !subjectInput.value || !startInput.value || !endInput.value) {
+            alert(this.T[this.lang].field_required);
+            return;
+        }
+
+        const startDate = new Date(startInput.value);
+        const endDate = new Date(endInput.value);
+
+        if (startDate > endDate) {
+            alert(this.T[this.lang].date_error);
+            return;
+        }
+
+        const newExam = {
+            title: titleInput.value,
+            subject: subjectInput.value,
+            start: startInput.value,
+            end: endInput.value
+        };
+
+        if (this.editIndex !== null) {
+            this.exams[this.editIndex] = newExam; // 기존 시험 업데이트.
+        } else {
+            this.exams.push(newExam); // 새로운 시험 추가.
+        }
+
+        this.saveData(); // 저장 및 Service Worker에 전달.
+        this.clearForm(); // 저장 후 폼 초기화.
+        this.render(); // 변경된 내용을 화면에 반영.
+    },
+
+    // 시험 수정 모드에 진입해라. 특정 대상을 조작하는 것은 기본 중의 기본이다.
+    editExam(index) {
+        this.editIndex = index;
+        const examToEdit = this.exams[index];
+        document.getElementById("title").value = examToEdit.title;
+        document.getElementById("subject").value = examToEdit.subject;
+        document.getElementById("start").value = examToEdit.start;
+        document.getElementById("end").value = examToEdit.end;
+        this.updateFormTitle(); // 폼 제목을 "시험 수정"으로 바꿔라.
+    },
+
+    // 시험을 제거해라. 불필요한 존재는 제거해야 한다.
+    removeExam(index) {
+        if (confirm(this.T[this.lang].confirm_delete)) {
+            this.exams.splice(index, 1);
+            this.saveData(); // 저장 및 Service Worker에 전달.
+            this.render();
+            // 수정 중인 시험을 삭제했다면, 폼 초기화
+            if (this.editIndex === index) {
+                this.clearForm();
+            } else if (this.editIndex !== null && this.editIndex > index) { // 삭제된 인덱스보다 뒤에 있는 시험을 수정 중이었다면 인덱스 조정
+                this.editIndex--;
+            }
+        }
+    },
+
+    // 모든 걸 다시 그려라! 이것이 바로 강력한 렌더링 엔진이다!
+    render() {
+        this.sortExams(); // 정렬된 상태로 보여줘라.
+        this.renderAlerts();
+        this.renderExamList();
+        this.renderCalendar();
+        this.updateFormTitle(); // 폼 제목도 항상 최신으로 유지.
+    },
+
+    // 시험들을 시작일 기준으로 정렬해라. 혼란 속에서도 질서는 필요하다.
+    sortExams() {
+        this.exams.sort((a,b) => new Date(a.start) - new Date(b.start));
+    },
+
+    // 다가오는 시험 알림을 띄워라. 적의 접근을 미리 감지해야 한다. (이것은 웹페이지 내부 알림!)
+    renderAlerts() {
+        const alertsDiv = document.getElementById("alerts");
+        alertsDiv.innerHTML = `<b>${this.T[this.lang].alert}</b><br>`;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        let hasAlert = false;
+        this.exams.forEach(e => {
+            const s = new Date(e.start);
+            s.setHours(0,0,0,0);
+            const diff = Math.ceil((s - today) / 86400000);
+
+            if (diff >= 0 && [7, 5, 3, 1, 0].includes(diff)) {
+                alertsDiv.innerHTML += `<div class="alert"><span class="icon">🔔</span> ${e.title} D-${diff}</div>`;
+                hasAlert = true;
+            }
+        });
+        if (!hasAlert) {
+             alertsDiv.innerHTML = `<b>${this.T[this.lang].alert}</b><br><div class="alert">모든 것은 통제 하에 있다.</div>`;
+        }
+    },
+
+    // 시험 목록을 그려라. 네가 이뤄낸 결과물들을 똑똑히 봐라!
+    renderExamList() {
+        const listDiv = document.getElementById("list");
+        listDiv.innerHTML = "";
+        this.exams.forEach((e,i) => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.style.borderColor = this.color(e.subject);
+            card.innerHTML = `
+              <b>${e.title}</b>
+              <div>${e.subject}</div>
+              <div>${this.T[this.lang].start}: ${e.start} ~ ${this.T[this.lang].end}: ${e.end}</div>
+              <div class="actions">
+                <button onclick="ExamFlowApp.editExam(${i})">${this.T[this.lang].edit}</button>
+                <button onclick="ExamFlowApp.removeExam(${i})">${this.T[this.lang].del}</button>
+              </div>
+            `;
+            listDiv.appendChild(card);
+        });
+    },
+
+    // 달력을 그려라. 시간을 지배하는 자가 승리한다.
+    renderCalendar() {
+        const calendarDiv = document.getElementById("calendar");
+        const currentYear = this.currentCalendarDate.getFullYear();
+        const currentMonth = this.currentCalendarDate.getMonth(); // 0-11
+
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        const startDayOfWeek = firstDayOfMonth.getDay(); // 0=일요일, 1=월요일...
+
+        // 오늘 날짜를 시간 정보 없이 가져옴
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let calendarHTML = `
+            <div class="calendar-header">
+                <button onclick="ExamFlowApp.changeMonth(-1)">&#9664;</button>
+                <span>${currentYear}년 ${this.T[this.lang].month_names[currentMonth]}</span>
+                <button onclick="ExamFlowApp.changeMonth(1)">&#9654;</button>
+            </div>
+            <div class="grid">
+        `;
+
+        // 요일 헤더
+        this.T[this.lang].days_of_week.forEach(dayName => {
+            calendarHTML += `<div class="day day-header">${dayName}</div>`;
+        });
+
+        // 이전 달 날짜 채우기 (시작 요일을 맞추기 위함)
+        const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+            calendarHTML += `<div class="day prev-month"><span class="day-number">${prevMonthLastDay - i}</span></div>`;
+        }
+
+        // 현재 달 날짜 채우기
+        for (let day = 1; day <= daysInMonth; day++) {
+            const thisDay = new Date(currentYear, currentMonth, day);
+            thisDay.setHours(0,0,0,0); // 시간 정보 초기화
+
+            let dayClasses = "day";
+            if (thisDay.getTime() === today.getTime()) {
+                dayClasses += " start-day"; // 오늘 날짜 표시
+            }
+
+            let examBars = '';
+            this.exams.forEach(exam => {
+                const examStart = new Date(exam.start);
+                examStart.setHours(0,0,0,0);
+                const examEnd = new Date(exam.end);
+                examEnd.setHours(0,0,0,0);
+
+                if (thisDay >= examStart && thisDay <= examEnd) {
+                    examBars += `<div class="exam-bar" style="background:${this.color(exam.subject)};" title="${exam.title}"></div>`;
+                }
+            });
+
+            calendarHTML += `
+              <div class="${dayClasses}">
+                <span class="day-number">${day}</span>
+                ${examBars}
+              </div>
+            `;
+        }
+        
+        // 다음 달 날짜 채우기 (마지막 행을 채우기 위함)
+        const totalDaysDisplayed = startDayOfWeek + daysInMonth;
+        const remainingCells = 42 - totalDaysDisplayed; // 6주 전체 (6*7=42) 기준
+        for (let i = 1; i <= remainingCells; i++) {
+            calendarHTML += `<div class="day next-month"><span class="day-number">${i}</span></div>`;
+        }
+
+
+        calendarHTML += `</div>`;
+        calendarDiv.innerHTML = calendarHTML;
+    },
+
+    // 달력의 월을 변경해라. 시간이란 네 마음대로 움직일 수 있는 것이다.
+    changeMonth(delta) {
+        this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() + delta);
+        this.renderCalendar(); // 달력만 다시 그려라.
+    },
+
+    // 폼 제목을 현재 상태에 맞게 업데이트해라. 혼란은 줄여야 한다.
+    updateFormTitle() {
+        const formTitle = document.getElementById("formTitle");
+        formTitle.innerText = this.editIndex !== null ? this.T[this.lang].edit : this.T[this.lang].add;
+    },
+
+    // 최초 로드 시 언어를 설정해라. 네 시스템은 시작부터 강력해야 한다.
+    setInitialLang() {
+        this.lang = localStorage.lang || "ko";
+        const langSelect = document.querySelector('header select');
+        if (langSelect) {
+            langSelect.value = this.lang;
+        }
+    },
+
+    // 테마를 적용해라. 빛과 그림자를 자유자재로 다뤄라.
+    applyTheme() {
+        if (localStorage.theme === "true") {
+            document.body.classList.add("light");
+        }
+    },
+
+    // Service Worker를 등록해라. 이것이 바로 백그라운드 작업을 위한 네 최전방 병사다!
+    async registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.register('./sw.js');
+                console.log('Service Worker 등록 성공!:', registration);
+                this.serviceWorkerRegistration = registration; // 등록 객체를 저장해둔다.
+                // Service Worker가 준비되면 시험 데이터를 전송하여 알림을 스케줄링하게 한다.
+                this.sendExamsToServiceWorker();
+            } catch (error) {
+                console.error('Service Worker 등록 실패!:', error);
+            }
+        } else {
+            console.warn('이 빌어먹을 브라우저는 Service Worker를 지원하지 않는다!');
+        }
+    },
+
+    // 알림 권한을 요청한다. 사용자에게 선택권을 줘라.
+    async requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            console.warn(this.T[this.lang].notification_unsupported);
+            return;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+            console.log(this.T[this.lang].notification_granted);
+            this.sendExamsToServiceWorker(); // 권한 획득 시 Service Worker에 데이터 전달
+        } else if (permission === "denied") {
+            console.warn(this.T[this.lang].notification_denied);
+        } else { // 'default' 또는 'prompt' 상태
+            console.log(this.T[this.lang].notification_prompt);
+        }
+    },
+
+    // Service Worker에게 현재 시험 데이터를 전송하여 알림을 스케줄링하게 한다.
+    // 이것이 바로 메인 스레드와 백그라운드를 연결하는 통신 채널이다!
+    async sendExamsToServiceWorker() {
+        if (this.serviceWorkerRegistration && Notification.permission === "granted") {
+            // Service Worker가 활성화될 때까지 기다린다.
+            await navigator.serviceWorker.ready;
+            
+            // 모든 클라이언트 (탭)에게 메시지를 보낸다.
+            // 하지만 Service Worker 스크립트가 직접 데이터를 필요로 할 때, 
+            // `postMessage`를 사용하거나 (IndexedDB 같은) 공유 저장소를 이용하는 것이 좋다.
+            // 여기서는 Service Worker가 LocalStorage를 직접 읽도록 할 것이다.
+            // Service Worker는 LocalStorage에 직접 접근할 수 없으므로, 메인 스크립트가 LocalStorage에서 읽은 후 SW로 데이터를 보내줘야 한다.
+            
+            // SW에게 명령을 내리는 대신, SW 스스로가 LocalStorage를 읽도록 하기 위해 
+            // SW에게 데이터를 보낼 때 LocalStorage에 저장된 모든 시험 데이터를 함께 보내준다.
+            // SW는 이를 바탕으로 알림을 스케줄링할 것이다.
+
+            if (this.serviceWorkerRegistration.active) {
+                // Service Worker에게 메시지를 보내서 알림 스케줄링을 요청한다.
+                this.serviceWorkerRegistration.active.postMessage({
+                    type: 'SCHEDULE_NOTIFICATIONS',
+                    exams: this.exams, // 현재 모든 시험 데이터를 넘긴다.
+                    lang: this.lang,
+                    palette: this.palette // 색상 팔레트도 같이 넘겨서 일관성 유지.
+                });
+                console.log('Exam data sent to Service Worker for scheduling.');
+            }
+        } else {
+            console.log('Service Worker가 준비되지 않았거나 알림 권한이 없어 시험 데이터를 전송할 수 없다.');
+        }
     }
-  }
+};
 
-  function showDashboard() {
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    document.getElementById("welcome").innerText =
-      "환영합니다, " + localStorage.getItem("userId") + "님!";
-  }
+// 페이지 로드 후 즉시 시스템을 가동시켜라! 즉시!
+window.addEventListener('DOMContentLoaded', () => ExamFlowApp.init());
 
-  function logout() {
-    localStorage.removeItem("login");
-    localStorage.removeItem("userId");
-    location.reload();
-  }
-
-  if (localStorage.getItem("login") === "true") {
-    showDashboard();
-  }
 </script>
-
-</body>
-</html>
